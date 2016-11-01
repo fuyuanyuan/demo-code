@@ -1,0 +1,143 @@
+http://wiki.swoole.com/      官方文档
+https://github.com/LinkedDestiny/swoole-doc   github上的教程
+https://github.com/LinkedDestiny/swoole-src-analysis     github上的源码分析（大神到处有）
+
+
+
+
+
+websocket+swoole  最简单的示例（搬运工）
+服务端：
+<?php
+//创建websocket服务器对象，监听0.0.0.0:9502端口
+$ws = new swoole_websocket_server("211.151.70.16", 30359);
+//监听WebSocket连接打开事件
+$ws->on('open', function ($ws, $request) {
+    var_dump($request->fd, $request->get, $request->server);
+    $ws->push($request->fd, "hello, welcome\n");
+});
+//监听WebSocket消息事件
+$ws->on('message', function ($ws, $frame) {
+    echo "Message: {$frame->data}\n";
+    $ws->push($frame->fd, "server: {$frame->data}");
+});
+//监听WebSocket连接关闭事件
+$ws->on('close', function ($ws, $fd) {
+    echo "client-{$fd} is closed\n";
+});
+$ws->start();
+
+服务端：
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<title>WebSocket Test</title>
+</head>
+<body>
+</body>
+<script type="text/javascript">
+var wsServer = 'ws://211.151.70.16:30359';
+var websocket = new WebSocket(wsServer);
+websocket.onopen = function (evt) {
+    console.log("Connected to WebSocket server.");
+};
+websocket.onclose = function (evt) {
+    console.log("Disconnected");
+};
+websocket.onmessage = function (evt) {
+    console.log('Retrieved data from server: ' + evt.data);
+};
+websocket.onerror = function (evt, e) {
+    console.log('Error occured: ' + evt.data);
+};
+</script>
+</html>
+
+
+
+
+swoole tcp  最简单的示例（搬运工）
+这个客户端是同步阻塞的，connect/send/recv 会等待IO完成后再返回。同步阻塞操作并不消耗CPU资源，IO操作未完成当前进程会自动转入sleep模式，当IO完成后操作系统会唤醒当前进程，继续向下执行代码。
+
+server端：
+<?php
+//创建Server对象，监听 127.0.0.1:9501端口
+$serv = new swoole_server("211.151.70.16", 30359);
+
+//监听连接进入事件
+$serv->on('connect', function ($serv, $fd) {
+    echo "Client: Connect.\n";
+});
+
+//监听数据发送事件
+$serv->on('receive', function ($serv, $fd, $from_id, $data) {
+    $serv->send($fd, "Server: ".$data);
+});
+
+//监听连接关闭事件
+$serv->on('close', function ($serv, $fd) {
+    echo "Client: Close.\n";
+});
+
+//启动服务器
+$serv->start();
+
+client端：
+<?php
+$client = new swoole_client(SWOOLE_SOCK_TCP);
+
+//连接到服务器
+if (!$client->connect('211.151.70.16', 30359, 0.5))
+{
+    die("connect failed.");
+}
+//向服务器发送数据
+if (!$client->send("hello world"))
+{
+    die("send failed.");
+}
+//从服务器接收数据
+$data = $client->recv();
+if (!$data)
+{
+    die("recv failed.");
+}
+echo $data;
+//关闭连接
+$client->close();
+
+
+
+swoole异步执行任务（搬运工）
+server端：
+<?php
+$serv = new swoole_server("211.151.70.16", 30359);
+
+//设置异步任务的工作进程数量
+$serv->set(array('task_worker_num' => 4));
+
+$serv->on('receive', function($serv, $fd, $from_id, $data) {
+    //投递异步任务
+    $task_id = $serv->task($data);
+    echo "Dispath AsyncTask: id=$task_id\n";
+});
+
+//处理异步任务
+$serv->on('task', function ($serv, $task_id, $from_id, $data) {
+    echo "New AsyncTask[id=$task_id]".PHP_EOL;
+    //返回任务执行的结果
+    $serv->finish("$data -> OK");
+});
+
+//处理异步任务的结果
+$serv->on('finish', function ($serv, $task_id, $data) {
+    echo "AsyncTask[$task_id] Finish: $data".PHP_EOL;
+});
+
+$serv->start();
+
