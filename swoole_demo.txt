@@ -10,7 +10,9 @@ https://github.com/LinkedDestiny/swoole-src-analysis     github上的源码分�
 
 
 websocket+swoole  最简单的示例（搬运工）
+
 服务端：
+
 <?php
 //创建websocket服务器对象，监听0.0.0.0:9502端口
 $ws = new swoole_websocket_server("211.151.70.16", 30359);
