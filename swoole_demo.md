@@ -1,6 +1,9 @@
 http://wiki.swoole.com/      官方文档
+
 https://github.com/LinkedDestiny/swoole-doc   github上的教程
+
 https://github.com/LinkedDestiny/swoole-src-analysis     github上的源码分析（大神到处有）
+
 
 
 
