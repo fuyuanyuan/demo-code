@@ -1,6 +1,6 @@
 <?php
 /**
- * 简单工厂模式是通过一个静态方法创建对象的
+ * 静态工厂模式是通过一个静态方法创建对象的
  */
 interface people
 {
@@ -21,23 +21,21 @@ class women implements people
     }
 }
 
-class SimpleFactoty
+class StaticFactoty
 {
-    function createMan(){
+    static function createMan(){
         return new man;
     }
 
-    function createWomen(){
+    static function createWomen(){
         return new women;
     }
 }
 
 
 
-$man = new SimpleFactoty;
-$man->createMan();
+$man = StaticFactoty::createMan();
 $man->show();
 
-$women = new SimpleFactoty;
-$women->createWomen();
+$women = StaticFactoty::createWomen();
 $women->show();
