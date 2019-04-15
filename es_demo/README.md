@@ -5,81 +5,672 @@
 
 
 ```json
-
 {
-	"article_index_test1": {
-		"mappings": {
-			"article": {
-				"dynamic": "false",
-				"_all": {
-					"enabled": false
-				},
-				"properties": {
-					"article_id": {
-						"type": "integer",
-						"ignore_malformed": true
-					},
-					"article_res_card": {
-						"type": "nested",
-						"properties": {
-							"common_keyword": {
-								"type": "keyword",
-								"ignore_above": 256
-							},
-							"data_type": {
-								"type": "keyword",
-								"ignore_above": 256
-							},
-							"title_ansj": {
-								"type": "text",
-								"similarity": "zdm_bm25",
-								"analyzer": "index_ansj",
-								"search_analyzer": "query_ansj"
-							},
-							"title_ik": {
-								"type": "text",
-								"similarity": "zdm_bm25",
-								"analyzer": "ik_max_word"
-							},
-							"url": {
-								"type": "keyword",
-								"ignore_above": 256
-							},
-							"url_md5": {
-								"type": "keyword",
-								"ignore_above": 256
-							},
-							"wiki_id": {
-								"type": "keyword",
-								"ignore_above": 256
-							},
-							"wiki_url": {
-								"type": "keyword",
-								"ignore_above": 256
-							}
-						}
-					},
-					"article_res_card_titles": {
-						"type": "keyword",
-						"fields": {
-							"keyword_ansj": {
-								"type": "text",
-								"similarity": "zdm_bm25",
-								"analyzer": "index_ansj",
-								"search_analyzer": "query_ansj"
-							},
-							"keyword_ik": {
-								"type": "text",
-								"similarity": "zdm_bm25",
-								"analyzer": "ik_max_word"
-							}
-						},
-						"ignore_above": 256
-					}
-				}
-			}
-		}
-	}
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "bool": {
+            "should": [
+              {
+                "query_string": {
+                  "query": "小米",
+                  "fields": [
+                    "article_title.ik",
+                    "article_title.ansj"
+                  ],
+                  "analyzer": "query_ansj",
+                  "default_operator": "and"
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "小米",
+                      "fields": [
+                        "seo_tdk_field.keyword_ik",
+                        "seo_tdk_field.keyword_ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "match_phrase": {
+                      "article_card_title_list.keyword_ik": {
+                        "query": "小米",
+                        "analyzer": "query_ansj",
+                        "slop": 99
+                      }
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "match_phrase": {
+                      "article_card_title_list.keyword_ansj": {
+                        "query": "小米",
+                        "analyzer": "query_ansj",
+                        "slop": 99
+                      }
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "article_card_common_keyword": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "article_tag_names": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "mall_info.name_cn": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "mall_info.name_en": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.cn_title": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.en_title": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.common_title": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.associate_title": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "category_info.title": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "category_info.search_nicktitle": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "article_category_names": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "search_common_keyword": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "小米",
+                      "fields": [
+                        "origin_title.ik",
+                        "origin_title.ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "wiki_brand_names": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "wiki_aliases_names": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "wiki_category_names": [
+                        "小米"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "小米",
+                      "fields": [
+                        "wiki_names.ik",
+                        "wiki_names.ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "小米",
+                      "fields": [
+                        "fav_price.keyword_ik",
+                        "fav_price.keyword_ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "小米",
+                      "fields": [
+                        "homepage_title.ik",
+                        "homepage_title.ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "query_string": {
+                  "query": "xiaomi",
+                  "fields": [
+                    "article_title.ik",
+                    "article_title.ansj"
+                  ],
+                  "analyzer": "query_ansj",
+                  "default_operator": "and"
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "xiaomi",
+                      "fields": [
+                        "seo_tdk_field.keyword_ik",
+                        "seo_tdk_field.keyword_ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "match_phrase": {
+                      "article_card_title_list.keyword_ik": {
+                        "query": "xiaomi",
+                        "analyzer": "query_ansj",
+                        "slop": 99
+                      }
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "match_phrase": {
+                      "article_card_title_list.keyword_ansj": {
+                        "query": "xiaomi",
+                        "analyzer": "query_ansj",
+                        "slop": 99
+                      }
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "article_card_common_keyword": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "article_tag_names": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "mall_info.name_cn": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "mall_info.name_en": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.cn_title": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.en_title": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.common_title": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "brand_info.associate_title": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "category_info.title": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "category_info.search_nicktitle": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "article_category_names": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "search_common_keyword": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "xiaomi",
+                      "fields": [
+                        "origin_title.ik",
+                        "origin_title.ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "wiki_brand_names": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "wiki_aliases_names": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "terms": {
+                      "wiki_category_names": [
+                        "xiaomi"
+                      ]
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "xiaomi",
+                      "fields": [
+                        "wiki_names.ik",
+                        "wiki_names.ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "xiaomi",
+                      "fields": [
+                        "fav_price.keyword_ik",
+                        "fav_price.keyword_ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              },
+              {
+                "constant_score": {
+                  "filter": {
+                    "query_string": {
+                      "query": "xiaomi",
+                      "fields": [
+                        "homepage_title.ik",
+                        "homepage_title.ansj"
+                      ],
+                      "analyzer": "query_ansj",
+                      "default_operator": "and"
+                    }
+                  },
+                  "boost": 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "filter": [
+              {
+                "terms": {
+                  "article_type": [
+                    "haowubang",
+                    "zhongce_product",
+                    "coupon",
+                    "zhongce",
+                    "wiki_product",
+                    "zhuanti",
+                    "shai",
+                    "haitao",
+                    "finder",
+                    "pinpai_zhuanti",
+                    "faxian",
+                    "youhui",
+                    "yuanchuang",
+                    "newbrand",
+                    "news",
+                    "video"
+                  ]
+                }
+              },
+              {
+                "terms": {
+                  "is_review": [
+                    0,
+                    1,
+                    2
+                  ]
+                }
+              }
+            ],
+            "must_not": [
+              {
+                "terms": {
+                  "article_category_ids": [
+                    4811
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "article_publish_time": {
+        "order": "desc"
+      }
+    }
+  ],
+  "from": 0,
+  "size": 20
 }
 ```
 
